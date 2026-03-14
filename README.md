@@ -1,9 +1,8 @@
 # Smoke Effect Add-on for MyWallpaper
 
-Animated smoke effect with customizable colors and fluid dynamics. Pure WebGL2 shader with Fractal Brownian Motion.
+Animated smoke effect with customizable color, motion, density, and performance controls. Pure WebGL2 shader with Fractal Brownian Motion.
 
 ![MyWallpaper Add-on](https://img.shields.io/badge/MyWallpaper-Add--on-purple?style=for-the-badge)
-![SDK Version](https://img.shields.io/badge/SDK-2.17.1-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ## Settings
@@ -11,27 +10,31 @@ Animated smoke effect with customizable colors and fluid dynamics. Pure WebGL2 s
 ### Colors
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| Primary Color | color | `#FF6B35` | Main smoke color |
-| Secondary Color | color | `#FF0000` | Blends with primary |
-| Randomize Colors | button | - | Generate harmonious random colors |
+| Smoke Color | color | `#FFFFFF` | Main smoke color |
+| Randomize Color | button | - | Generate a new smoke color |
 
 ### Motion
 | Setting | Range | Default | Description |
 |---------|-------|---------|-------------|
-| Speed | 0 - 1 | 0.2 | How fast the smoke moves |
+| Speed | 0 - 1 | 0.28 | How fast the smoke moves |
 | Origin | 0 - 360 | 0 | Where smoke comes from (0=bottom, 90=left, 180=top, 270=right) |
 | Direction | 0 - 360 | 0 | Where smoke travels toward (0=up, 90=right, 180=down, 270=left) |
+
+### Performance
+| Setting | Range | Default | Description |
+|---------|-------|---------|-------------|
+| Quality | 0.25 - 1 | 1.0 | Rendering resolution scale (lower = faster) |
 
 ### Appearance
 | Setting | Range | Default | Description |
 |---------|-------|---------|-------------|
-| Scale | 0.2 - 5 | 1.0 | Pattern size (bigger = larger patterns) |
-| Brightness | 0.1 - 3 | 0.9 | Color brightness (0.9 = natural, 2+ = glowing) |
+| Scale | 0.2 - 50 | 6.0 | Pattern size (bigger = larger patterns) |
+| Brightness | 0.1 - 3 | 1.0 | Color brightness (1.0 = neutral, 2+ = glowing) |
 | Opacity | 0 - 1 | 1.0 | Overall transparency |
-| Detail | 0 - 3 | 0.75 | Noise complexity (0=blobs, 3=fine details) |
-| Turbulence | 0 - 2 | 0.9 | Chaos and distortion |
-| Fade | 0.1 - 2 | 1.0 | Gradient sharpness (low = hard edge, high = soft fade) |
-| Height | 0.3 - 3 | 1.0 | How far the smoke extends |
+| Detail | 0 - 3 | 1.25 | Noise complexity (higher = finer details) |
+| Turbulence | 0 - 2 | 2.0 | Chaos and distortion |
+| Density | 0.1 - 3 | 0.5 | Smoke thickness |
+| Height | 0 - 3 | 0.7 | How far the smoke extends |
 
 ## Installation
 
