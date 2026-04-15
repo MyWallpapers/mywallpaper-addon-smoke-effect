@@ -1,6 +1,6 @@
 {
   "name": "Smoke Effect",
-  "version": "8.0.3",
+  "version": "8.0.4",
   "description": "Mesmerizing animated smoke effect with customizable colors and fluid dynamics. Premium WebGL shader with Fractal Brownian Motion.",
   "author": "MyWallpaper Community",
   "type": "widget",
@@ -8,7 +8,6 @@
   "categories": ["effects", "animations", "backgrounds"],
   "license": "MIT",
   "repository": "https://github.com/MyWallpapers/mywallpaper-smoke-effect",
-
   "defaultLayout": {
     "xPercent": 0,
     "yPercent": 0,
@@ -16,138 +15,167 @@
     "heightPercent": 100,
     "rotation": 0
   },
-
   "ui": {
     "pointerEvents": "none"
   },
-
   "settings": {
     "colorsSection": {
       "type": "section",
-      "label": "🎨 Colors"
+      "content": {
+        "label": "🎨 Colors"
+      }
     },
     "color": {
       "type": "color",
-      "label": "Smoke Color",
-      "default": "#FFFFFF"
+      "content": {
+        "label": "Smoke Color",
+        "default": "#FFFFFF"
+      }
     },
     "randomizeColorBtn": {
       "type": "button",
-      "buttonLabel": "🎲 Randomize Color"
+      "content": {
+        "buttonLabel": "🎲 Randomize Color"
+      }
     },
-
     "motionSection": {
       "type": "section",
-      "label": "💨 Motion"
+      "content": {
+        "label": "💨 Motion"
+      }
     },
     "speed": {
       "type": "range",
-      "label": "Speed",
-      "description": "How fast the smoke moves",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.01,
-      "default": 0.28
+      "content": {
+        "label": "Speed",
+        "description": "How fast the smoke moves",
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.28
+      }
     },
     "origin": {
       "type": "range",
-      "label": "Origin",
-      "description": "Where smoke comes from (0° = bottom, 90° = left, 180° = top, 270° = right)",
-      "min": 0,
-      "max": 360,
-      "step": 1,
-      "default": 0
+      "content": {
+        "label": "Origin",
+        "description": "Where smoke comes from (0° = bottom, 90° = left, 180° = top, 270° = right)",
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "default": 0
+      }
     },
     "direction": {
       "type": "range",
-      "label": "Direction",
-      "description": "Where smoke travels toward (0° = up, 90° = right, 180° = down, 270° = left)",
-      "min": 0,
-      "max": 360,
-      "step": 1,
-      "default": 0
+      "content": {
+        "label": "Direction",
+        "description": "Where smoke travels toward (0° = up, 90° = right, 180° = down, 270° = left)",
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "default": 0
+      }
     },
-
     "performanceSection": {
       "type": "section",
-      "label": "⚡ Performance"
+      "content": {
+        "label": "⚡ Performance"
+      }
     },
     "quality": {
       "type": "range",
-      "label": "Quality",
-      "description": "Rendering resolution (lower = faster, 1 = full resolution)",
-      "min": 0.25,
-      "max": 1.0,
-      "step": 0.05,
-      "default": 1.0
+      "content": {
+        "label": "Quality",
+        "description": "Rendering resolution (lower = faster, 1 = full resolution)",
+        "min": 0.25,
+        "max": 1.0,
+        "step": 0.05,
+        "default": 1.0
+      }
     },
-
     "appearanceSection": {
       "type": "section",
-      "label": "🌫️ Appearance"
+      "content": {
+        "label": "🌫️ Appearance"
+      }
     },
     "scale": {
       "type": "range",
-      "label": "Scale",
-      "description": "Size of smoke patterns (bigger = larger patterns)",
-      "min": 0.2,
-      "max": 50.0,
-      "step": 0.1,
-      "default": 6.0
+      "content": {
+        "label": "Scale",
+        "description": "Size of smoke patterns (bigger = larger patterns)",
+        "min": 0.2,
+        "max": 50.0,
+        "step": 0.1,
+        "default": 6.0
+      }
     },
     "brightness": {
       "type": "range",
-      "label": "Brightness",
-      "description": "Color brightness (0.9 = natural, 2+ = glowing)",
-      "min": 0.1,
-      "max": 3.0,
-      "step": 0.1,
-      "default": 1.0
+      "content": {
+        "label": "Brightness",
+        "description": "Color brightness (0.9 = natural, 2+ = glowing)",
+        "min": 0.1,
+        "max": 3.0,
+        "step": 0.1,
+        "default": 1.0
+      }
     },
     "opacity": {
       "type": "range",
-      "label": "Opacity",
-      "description": "Overall smoke transparency",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.01,
-      "default": 1.0
+      "content": {
+        "label": "Opacity",
+        "description": "Overall smoke transparency",
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      }
     },
     "detail": {
       "type": "range",
-      "label": "Detail",
-      "description": "Noise complexity (0 = smooth, 3 = fine details — 2 to 8 octaves)",
-      "min": 0,
-      "max": 3.0,
-      "step": 0.05,
-      "default": 1.25
+      "content": {
+        "label": "Detail",
+        "description": "Noise complexity (0 = smooth, 3 = fine details — 2 to 8 octaves)",
+        "min": 0,
+        "max": 3.0,
+        "step": 0.05,
+        "default": 1.25
+      }
     },
     "turbulence": {
       "type": "range",
-      "label": "Turbulence",
-      "description": "Chaos and distortion (0 = calm, 2 = chaotic)",
-      "min": 0,
-      "max": 2.0,
-      "step": 0.05,
-      "default": 2.0
+      "content": {
+        "label": "Turbulence",
+        "description": "Chaos and distortion (0 = calm, 2 = chaotic)",
+        "min": 0,
+        "max": 2.0,
+        "step": 0.05,
+        "default": 2.0
+      }
     },
     "density": {
       "type": "range",
-      "label": "Density",
-      "description": "Smoke thickness (low = wispy vapor, high = thick dense smoke)",
-      "min": 0.1,
-      "max": 3.0,
-      "step": 0.1,
-      "default": 0.5
+      "content": {
+        "label": "Density",
+        "description": "Smoke thickness (low = wispy vapor, high = thick dense smoke)",
+        "min": 0.1,
+        "max": 3.0,
+        "step": 0.1,
+        "default": 0.5
+      }
     },
     "height": {
       "type": "range",
-      "label": "Height",
-      "description": "How far smoke extends (noise-driven organic edge)",
-      "min": 0.0,
-      "max": 3.0,
-      "step": 0.1,
-      "default": 0.7
+      "content": {
+        "label": "Height",
+        "description": "How far smoke extends (noise-driven organic edge)",
+        "min": 0.0,
+        "max": 3.0,
+        "step": 0.1,
+        "default": 0.7
+      }
     }
   }
 }
