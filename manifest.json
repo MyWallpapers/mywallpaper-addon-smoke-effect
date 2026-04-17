@@ -5,9 +5,13 @@
   "author": "MyWallpaper Community",
   "type": "widget",
   "entry": "index.js",
-  "categories": ["effects", "animations", "backgrounds"],
+  "categories": [
+    "effects",
+    "animations",
+    "backgrounds"
+  ],
   "license": "MIT",
-  "repository": "https://github.com/MyWallpapers/mywallpaper-smoke-effect",
+  "repository": "https://github.com/MyWallpapers/mywallpaper-addon-smoke-effect",
   "defaultLayout": {
     "xPercent": 0,
     "yPercent": 0,
@@ -49,8 +53,8 @@
       "content": {
         "label": "Speed",
         "description": "How fast the smoke moves",
-        "min": 0.0,
-        "max": 1.0,
+        "min": 0,
+        "max": 1,
         "step": 0.01,
         "default": 0.28
       }
@@ -89,9 +93,9 @@
         "label": "Quality",
         "description": "Rendering resolution (lower = faster, 1 = full resolution)",
         "min": 0.25,
-        "max": 1.0,
+        "max": 1,
         "step": 0.05,
-        "default": 1.0
+        "default": 1
       }
     },
     "appearanceSection": {
@@ -106,9 +110,9 @@
         "label": "Scale",
         "description": "Size of smoke patterns (bigger = larger patterns)",
         "min": 0.2,
-        "max": 50.0,
+        "max": 50,
         "step": 0.1,
-        "default": 6.0
+        "default": 6
       }
     },
     "brightness": {
@@ -117,9 +121,9 @@
         "label": "Brightness",
         "description": "Color brightness (0.9 = natural, 2+ = glowing)",
         "min": 0.1,
-        "max": 3.0,
+        "max": 3,
         "step": 0.1,
-        "default": 1.0
+        "default": 1
       }
     },
     "opacity": {
@@ -127,10 +131,10 @@
       "content": {
         "label": "Opacity",
         "description": "Overall smoke transparency",
-        "min": 0.0,
-        "max": 1.0,
+        "min": 0,
+        "max": 1,
         "step": 0.01,
-        "default": 1.0
+        "default": 1
       }
     },
     "detail": {
@@ -139,7 +143,7 @@
         "label": "Detail",
         "description": "Noise complexity (0 = smooth, 3 = fine details — 2 to 8 octaves)",
         "min": 0,
-        "max": 3.0,
+        "max": 3,
         "step": 0.05,
         "default": 1.25
       }
@@ -150,9 +154,9 @@
         "label": "Turbulence",
         "description": "Chaos and distortion (0 = calm, 2 = chaotic)",
         "min": 0,
-        "max": 2.0,
+        "max": 2,
         "step": 0.05,
-        "default": 2.0
+        "default": 2
       }
     },
     "density": {
@@ -161,7 +165,7 @@
         "label": "Density",
         "description": "Smoke thickness (low = wispy vapor, high = thick dense smoke)",
         "min": 0.1,
-        "max": 3.0,
+        "max": 3,
         "step": 0.1,
         "default": 0.5
       }
@@ -171,8 +175,8 @@
       "content": {
         "label": "Height",
         "description": "How far smoke extends (noise-driven organic edge)",
-        "min": 0.0,
-        "max": 3.0,
+        "min": 0,
+        "max": 3,
         "step": 0.1,
         "default": 0.7
       }
