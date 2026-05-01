@@ -1,6 +1,23 @@
-import { jsx as q } from "react/jsx-runtime";
-import { useSettings as z, useViewport as B, useSettingsActions as G } from "@mywallpaper/sdk-react";
-import { useRef as E, useMemo as H, useCallback as V, useEffect as I } from "react";
+const __MYWALLPAPER_WIDGET_RUNTIME_CONTRACT__ = "1";
+if (!__canvasRuntime) {
+      throw new Error('Canvas runtime globals are unavailable');
+    }
+if (!__canvasRuntime.react || !__canvasRuntime.reactJsxRuntime || !__canvasRuntime.sdkReact || !__canvasRuntime.sdkContracts || !__canvasRuntime.sdkPermissions) {
+      throw new Error('Canvas runtime globals are unavailable');
+    }
+const __canvasRuntimeReact = __canvasRuntime.react;
+const __canvasRuntimeJsxRuntime = __canvasRuntime.reactJsxRuntime;
+const __canvasRuntimeSdk = __canvasRuntime.sdkReact;
+const __canvasRuntimeSdkContracts = __canvasRuntime.sdkContracts;
+const __canvasRuntimeSdkPermissions = __canvasRuntime.sdkPermissions;
+const q = __canvasRuntimeJsxRuntime.jsx;
+const z = __canvasRuntimeSdk.useSettings;
+const B = __canvasRuntimeSdk.useViewport;
+const G = __canvasRuntimeSdk.useSettingsActions;
+const E = __canvasRuntimeReact.useRef;
+const H = __canvasRuntimeReact.useMemo;
+const V = __canvasRuntimeReact.useCallback;
+const I = __canvasRuntimeReact.useEffect;
 const W = {
   color: "#FFFFFF",
   speed: 0.28,

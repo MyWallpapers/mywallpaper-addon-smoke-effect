@@ -1,6 +1,6 @@
 {
   "name": "mywallpaper-addon-smoke-effect",
-  "version": "8.0.4",
+  "version": "8.0.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
     "@types/react": "^19.0.0",
     "react": "^19.0.0",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^7.3.2",
+    "@mywallpaper/vite-plugin": "file:../MyWallpaper/packages/vite-plugin"
   }
 }
