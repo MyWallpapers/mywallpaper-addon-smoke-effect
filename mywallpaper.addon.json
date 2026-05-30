@@ -1,7 +1,7 @@
 {
   "name": "Smoke Effect",
-  "version": "8.0.6",
-  "description": "Mesmerizing animated smoke effect with customizable colors and fluid dynamics. Premium WebGL shader with Fractal Brownian Motion.",
+  "version": "9.0.0",
+  "description": "Simple animated smoke overlay with clean visual controls and no runtime permissions.",
   "author": "MyWallpaper Community",
   "type": "widget",
   "entry": "index.js",
@@ -12,6 +12,125 @@
   ],
   "license": "MIT",
   "repository": "https://github.com/MyWallpapers/mywallpaper-addon-smoke-effect",
+  "settings": {
+    "color": {
+      "type": "color",
+      "content": {
+        "label": "Smoke color",
+        "default": "#FFFFFF"
+      }
+    },
+    "randomizeColor": {
+      "type": "button",
+      "content": {
+        "buttonLabel": "Randomize color"
+      }
+    },
+    "style": {
+      "type": "select",
+      "content": {
+        "label": "Smoke style",
+        "default": "classic",
+        "options": [
+          {
+            "label": "Soft mist",
+            "value": "soft"
+          },
+          {
+            "label": "Classic smoke",
+            "value": "classic"
+          },
+          {
+            "label": "Dense cloud",
+            "value": "dense"
+          },
+          {
+            "label": "Storm flow",
+            "value": "storm"
+          }
+        ]
+      }
+    },
+    "intensity": {
+      "type": "range",
+      "content": {
+        "label": "Intensity",
+        "description": "Overall smoke visibility.",
+        "default": 0.7,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      }
+    },
+    "motion": {
+      "type": "range",
+      "content": {
+        "label": "Motion",
+        "description": "Animation speed and flow energy.",
+        "default": 0.35,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      }
+    },
+    "size": {
+      "type": "range",
+      "content": {
+        "label": "Smoke size",
+        "description": "Small wisps to large clouds.",
+        "default": 0.55,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      }
+    },
+    "direction": {
+      "type": "select",
+      "content": {
+        "label": "Direction",
+        "default": "up",
+        "options": [
+          {
+            "label": "Up",
+            "value": "up"
+          },
+          {
+            "label": "Right",
+            "value": "right"
+          },
+          {
+            "label": "Down",
+            "value": "down"
+          },
+          {
+            "label": "Left",
+            "value": "left"
+          }
+        ]
+      }
+    },
+    "quality": {
+      "type": "select",
+      "content": {
+        "label": "Quality",
+        "default": "balanced",
+        "options": [
+          {
+            "label": "Performance",
+            "value": "performance"
+          },
+          {
+            "label": "Balanced",
+            "value": "balanced"
+          },
+          {
+            "label": "High",
+            "value": "high"
+          }
+        ]
+      }
+    }
+  },
   "defaultLayout": {
     "xPercent": 0,
     "yPercent": 0,
@@ -21,165 +140,5 @@
   },
   "ui": {
     "pointerEvents": "none"
-  },
-  "settings": {
-    "colorsSection": {
-      "type": "section",
-      "content": {
-        "label": "🎨 Colors"
-      }
-    },
-    "color": {
-      "type": "color",
-      "content": {
-        "label": "Smoke Color",
-        "default": "#FFFFFF"
-      }
-    },
-    "randomizeColorBtn": {
-      "type": "button",
-      "content": {
-        "buttonLabel": "🎲 Randomize Color"
-      }
-    },
-    "motionSection": {
-      "type": "section",
-      "content": {
-        "label": "💨 Motion"
-      }
-    },
-    "speed": {
-      "type": "range",
-      "content": {
-        "label": "Speed",
-        "description": "How fast the smoke moves",
-        "min": 0,
-        "max": 1,
-        "step": 0.01,
-        "default": 0.28
-      }
-    },
-    "origin": {
-      "type": "range",
-      "content": {
-        "label": "Origin",
-        "description": "Where smoke comes from (0° = bottom, 90° = left, 180° = top, 270° = right)",
-        "min": 0,
-        "max": 360,
-        "step": 1,
-        "default": 0
-      }
-    },
-    "direction": {
-      "type": "range",
-      "content": {
-        "label": "Direction",
-        "description": "Where smoke travels toward (0° = up, 90° = right, 180° = down, 270° = left)",
-        "min": 0,
-        "max": 360,
-        "step": 1,
-        "default": 0
-      }
-    },
-    "performanceSection": {
-      "type": "section",
-      "content": {
-        "label": "⚡ Performance"
-      }
-    },
-    "quality": {
-      "type": "range",
-      "content": {
-        "label": "Quality",
-        "description": "Rendering resolution (lower = faster, 1 = full resolution)",
-        "min": 0.25,
-        "max": 1,
-        "step": 0.05,
-        "default": 1
-      }
-    },
-    "appearanceSection": {
-      "type": "section",
-      "content": {
-        "label": "🌫️ Appearance"
-      }
-    },
-    "scale": {
-      "type": "range",
-      "content": {
-        "label": "Scale",
-        "description": "Size of smoke patterns (bigger = larger patterns)",
-        "min": 0.2,
-        "max": 50,
-        "step": 0.1,
-        "default": 6
-      }
-    },
-    "brightness": {
-      "type": "range",
-      "content": {
-        "label": "Brightness",
-        "description": "Color brightness (0.9 = natural, 2+ = glowing)",
-        "min": 0.1,
-        "max": 3,
-        "step": 0.1,
-        "default": 1
-      }
-    },
-    "opacity": {
-      "type": "range",
-      "content": {
-        "label": "Opacity",
-        "description": "Overall smoke transparency",
-        "min": 0,
-        "max": 1,
-        "step": 0.01,
-        "default": 1
-      }
-    },
-    "detail": {
-      "type": "range",
-      "content": {
-        "label": "Detail",
-        "description": "Noise complexity (0 = smooth, 3 = fine details — 2 to 8 octaves)",
-        "min": 0,
-        "max": 3,
-        "step": 0.05,
-        "default": 1.25
-      }
-    },
-    "turbulence": {
-      "type": "range",
-      "content": {
-        "label": "Turbulence",
-        "description": "Chaos and distortion (0 = calm, 2 = chaotic)",
-        "min": 0,
-        "max": 2,
-        "step": 0.05,
-        "default": 2
-      }
-    },
-    "density": {
-      "type": "range",
-      "content": {
-        "label": "Density",
-        "description": "Smoke thickness (low = wispy vapor, high = thick dense smoke)",
-        "min": 0.1,
-        "max": 3,
-        "step": 0.1,
-        "default": 0.5
-      }
-    },
-    "height": {
-      "type": "range",
-      "content": {
-        "label": "Height",
-        "description": "How far smoke extends (noise-driven organic edge)",
-        "min": 0,
-        "max": 3,
-        "step": 0.1,
-        "default": 0.7
-      }
-    }
   }
 }
