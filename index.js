@@ -10,82 +10,67 @@ const __canvasRuntimeJsxRuntime = __canvasRuntime.reactJsxRuntime;
 const __canvasRuntimeSdk = __canvasRuntime.sdkReact;
 const __canvasRuntimeSdkContracts = __canvasRuntime.sdkContracts;
 const __canvasRuntimeSdkPermissions = __canvasRuntime.sdkPermissions;
-const I = __canvasRuntimeJsxRuntime.jsx;
-const k = __canvasRuntimeSdk.useSettings;
-const O = __canvasRuntimeSdk.useViewport;
-const X = __canvasRuntimeSdk.useSettingsActions;
-const V = __canvasRuntimeSdk.useSceneTimeTick;
-const x = __canvasRuntimeReact.useRef;
-const H = __canvasRuntimeReact.useState;
-const g = __canvasRuntimeReact.useEffect;
-const y = {
+const z = __canvasRuntimeJsxRuntime.jsx;
+const B = __canvasRuntimeSdk.useSettings;
+const G = __canvasRuntimeSdk.useViewport;
+const H = __canvasRuntimeSdk.useSettingsActions;
+const h = __canvasRuntimeReact.useRef;
+const V = __canvasRuntimeReact.useMemo;
+const O = __canvasRuntimeReact.useCallback;
+const C = __canvasRuntimeReact.useEffect;
+const W = {
   color: "#FFFFFF",
-  style: "classic",
-  intensity: 0.7,
-  motion: 0.35,
-  size: 0.55,
-  direction: "up",
-  quality: "balanced"
-}, G = {
-  soft: { alpha: 0.55, contrast: 0.72, density: 0.72, octaves: 4, turbulence: 0.55 },
-  classic: { alpha: 0.82, contrast: 0.92, density: 0.9, octaves: 5, turbulence: 0.82 },
-  dense: { alpha: 1.08, contrast: 1.08, density: 1.2, octaves: 5, turbulence: 0.95 },
-  storm: { alpha: 0.96, contrast: 1.22, density: 1.05, octaves: 6, turbulence: 1.35 }
-}, W = {
-  up: [0, 1],
-  right: [1, 0],
-  down: [0, -1],
-  left: [-1, 0]
+  speed: 0.28,
+  origin: 0,
+  direction: 0,
+  scale: 6,
+  brightness: 1,
+  opacity: 1,
+  detail: 1.25,
+  turbulence: 2,
+  density: 0.5,
+  height: 0.7,
+  quality: 1
 }, Y = {
-  performance: 0.55,
-  balanced: 0.75,
-  high: 1
-}, M = {
-  position: "fixed",
+  position: "absolute",
   inset: 0,
-  width: "100vw",
-  height: "100vh",
+  display: "block",
+  width: "100%",
+  height: "100%",
+  margin: 0,
+  padding: 0,
   pointerEvents: "none"
-}, q = {
-  ...M,
-  display: "block"
-}, B = {
-  ...M,
-  background: "radial-gradient(circle at 50% 70%, rgba(255,255,255,0.38), transparent 42%), radial-gradient(circle at 40% 35%, rgba(255,255,255,0.22), transparent 38%)",
-  filter: "blur(28px)",
-  opacity: 0.72
 }, $ = `#version 300 es
 precision mediump float;
-
-const vec2 POSITIONS[6] = vec2[6](
+const vec2 positions[6] = vec2[6](
   vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(-1.0, 1.0),
   vec2(-1.0, 1.0), vec2(1.0, -1.0), vec2(1.0, 1.0)
 );
-
-out vec2 v_uv;
-
+out vec2 uv;
 void main() {
-  v_uv = POSITIONS[gl_VertexID];
-  gl_Position = vec4(POSITIONS[gl_VertexID], 0.0, 1.0);
+  uv = positions[gl_VertexID];
+  gl_Position = vec4(positions[gl_VertexID], 0.0, 1.0);
 }
-`, K = `#version 300 es
+`, j = `#version 300 es
 precision highp float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform vec3 u_color;
-uniform vec2 u_direction;
-uniform float u_intensity;
-uniform float u_motion;
-uniform float u_size;
-uniform float u_alpha;
-uniform float u_contrast;
-uniform float u_density;
-uniform float u_octaves;
+uniform float u_speed;
+uniform float u_origin;
+uniform float u_direction;
+uniform float u_scale;
+uniform float u_brightness;
+uniform float u_opacity;
+uniform float u_detail;
 uniform float u_turbulence;
-uniform sampler2D u_noise;
+uniform float u_density;
+uniform float u_height;
+uniform float u_quality;
+uniform sampler2D u_noiseTexture;
 
-in vec2 v_uv;
+in vec2 uv;
 out vec4 fragColor;
 
 float hash(vec2 p) {
@@ -95,171 +80,182 @@ float hash(vec2 p) {
 }
 
 float noise(vec2 p) {
-  return texture(u_noise, p / 24.0).r;
+  return texture(u_noiseTexture, p / 16.0).r;
 }
 
-float fbm(vec2 p) {
+float fbm(vec2 p, int octaves) {
   float value = 0.0;
-  float amplitude = 0.52;
-  mat2 rotate = mat2(0.8, 0.6, -0.6, 0.8);
+  float amplitude = 0.4;
+  vec2 freq = p;
+  mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
 
-  for (int i = 0; i < 6; i++) {
-    if (float(i) >= u_octaves) break;
-    value += amplitude * noise(p);
-    p = rotate * p * 2.03 + vec2(7.1, 3.7);
-    amplitude *= 0.52;
+  for (int i = 0; i < 8; i++) {
+    if (i >= octaves) break;
+    value += amplitude * noise(freq);
+    freq = rot * freq * 2.0;
+    amplitude *= 0.4;
   }
-
   return value;
 }
 
 void main() {
-  vec2 pos = v_uv;
-  pos.x *= max(u_resolution.x / max(u_resolution.y, 1.0), 0.01);
+  vec2 pos = uv;
 
-  vec2 direction = normalize(u_direction);
-  float time = u_time * mix(0.04, 0.72, u_motion);
-  float scale = mix(13.0, 2.4, u_size);
+  float aspectRatio = u_resolution.x / u_resolution.y;
+  pos.x *= aspectRatio;
 
-  vec2 base = pos * scale - direction * time;
-  float slowWarp = fbm(base * 0.45 + direction.yx * time * 0.18);
-  vec2 warp = vec2(
-    fbm(base * 0.8 + vec2(slowWarp, time * 0.21)),
-    fbm(base * 0.8 + vec2(-time * 0.18, slowWarp))
-  ) - 0.5;
+  float originRad = radians(u_origin);
+  vec2 originDir = vec2(sin(originRad), cos(originRad));
+  float gradientBasis = dot(pos, originDir);
 
-  float smoke = fbm(base + warp * (2.2 * u_turbulence));
-  float wisps = fbm(base * 1.85 - warp * 1.4 + time * 0.08);
-  float body = mix(smoke, smoke * wisps * 1.65, 0.45);
+  if (gradientBasis > 3.0) {
+    fragColor = vec4(0.0);
+    return;
+  }
 
-  float alpha = smoothstep(0.24, 0.78, body * u_contrast);
-  alpha = pow(alpha, 1.0 / max(u_density, 0.05));
-  alpha *= mix(0.08, 0.92, u_intensity) * u_alpha;
+  float dirRad = radians(u_direction);
+  vec2 moveDir = vec2(sin(dirRad), cos(dirRad));
 
-  float vignette = smoothstep(1.55, 0.35, length(pos));
-  alpha *= mix(0.74, 1.0, vignette);
+  float t = u_time * u_speed;
+
+  vec2 smokeCoords = (pos - moveDir * t) * (7.0 / u_scale);
+
+  int octaves = 2 + int(u_detail * 2.0);
+
+  float baseNoise = fbm(smokeCoords, octaves);
+
+  float gradient = mix(gradientBasis * 0.3, gradientBasis * 0.7, baseNoise);
+
+  if (gradient > 1.0) {
+    fragColor = vec4(0.0);
+    return;
+  }
+
+  float warpY = noise(smokeCoords * 1.7 + vec2(5.2, 1.3));
+
+  float noise2 = u_turbulence * fbm(smokeCoords + vec2(baseNoise, warpY) + t * 0.7, min(octaves, 5)) - 0.5;
+
+  float smokeIntensity = fbm(vec2(noise2, baseNoise), max(octaves / 2, 2));
+
+  vec3 smokeColor = u_color * u_brightness;
+
+  float smokeAlpha = smoothstep(0.0, 0.8, (smokeIntensity - gradient + 0.3) * u_height);
+
+  smokeAlpha = pow(smokeAlpha, 1.0 / max(u_density, 0.01));
 
   float dither = (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) / 255.0;
-  fragColor = vec4(max(u_color + dither, vec3(0.0)), clamp(alpha + dither, 0.0, 1.0));
+  smokeColor += dither;
+  smokeAlpha += dither;
+
+  fragColor = vec4(smokeColor, smokeAlpha * u_opacity);
 }
 `;
-function A(e, o, a, n) {
-  return typeof e == "number" && Number.isFinite(e) ? Math.min(n, Math.max(a, e)) : o;
+function K(i) {
+  const n = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(i);
+  return n ? [
+    parseInt(n[1], 16) / 255,
+    parseInt(n[2], 16) / 255,
+    parseInt(n[3], 16) / 255
+  ] : [1, 1, 1];
 }
-function P(e, o, a) {
-  return typeof e == "string" && o.includes(e) ? e : a;
-}
-function j(e) {
-  return {
-    color: typeof e.color == "string" ? e.color : y.color,
-    style: P(e.style, ["soft", "classic", "dense", "storm"], y.style),
-    intensity: A(e.intensity, y.intensity, 0, 1),
-    motion: A(e.motion, y.motion, 0, 1),
-    size: A(e.size, y.size, 0, 1),
-    direction: P(e.direction, ["up", "right", "down", "left"], y.direction),
-    quality: P(e.quality, ["performance", "balanced", "high"], y.quality)
+function J(i, n, u) {
+  n /= 100, u /= 100;
+  const a = n * Math.min(u, 1 - u), f = (g) => {
+    const m = (g + i / 30) % 12, o = u - a * Math.max(Math.min(m - 3, 9 - m, 1), -1);
+    return Math.round(255 * o).toString(16).padStart(2, "0");
   };
+  return `#${f(0)}${f(8)}${f(4)}`;
 }
-function Q(e) {
-  const o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(e);
-  return o ? [parseInt(o[1], 16) / 255, parseInt(o[2], 16) / 255, parseInt(o[3], 16) / 255] : [1, 1, 1];
-}
-function J(e, o, a) {
-  const n = o / 100, u = a / 100, p = n * Math.min(u, 1 - u), s = (i) => {
-    const c = (i + e / 30) % 12, h = u - p * Math.max(Math.min(c - 3, 9 - c, 1), -1);
-    return Math.round(255 * h).toString(16).padStart(2, "0");
-  };
-  return `#${s(0)}${s(8)}${s(4)}`;
+function Q(i) {
+  let n = i >>> 0;
+  return () => (n = n * 1664525 + 1013904223 >>> 0, n / 4294967296);
 }
 function Z() {
-  return J(Math.random() * 360, 70 + Math.random() * 24, 48 + Math.random() * 18);
-}
-function ee(e) {
-  let o = e >>> 0;
-  return () => (o = o * 1664525 + 1013904223 >>> 0, o / 4294967296);
-}
-function te() {
-  const a = ee(98615518), n = new Uint8Array(256 * 256), u = new Float32Array(256 * 2);
-  for (let i = 0; i < 256; i += 1) {
-    const c = a() * Math.PI * 2;
-    u[i * 2] = Math.cos(c), u[i * 2 + 1] = Math.sin(c);
+  const u = new Uint8Array(65536), a = Q(98615518), f = new Float32Array(256 * 2);
+  for (let o = 0; o < 256; o++) {
+    const s = a() * Math.PI * 2;
+    f[o * 2] = Math.cos(s), f[o * 2 + 1] = Math.sin(s);
   }
-  const p = (i) => i * i * i * (i * (i * 6 - 15) + 10), s = (i, c, h, S) => {
-    const f = ((c % 16 + 16) % 16 * 16 + (i % 16 + 16) % 16) * 2;
-    return u[f] * h + u[f + 1] * S;
+  const g = (o) => o * o * o * (o * (o * 6 - 15) + 10), m = (o, s, p, E) => {
+    const d = ((s % 16 + 16) % 16 * 16 + (o % 16 + 16) % 16) * 2;
+    return f[d] * p + f[d + 1] * E;
   };
-  for (let i = 0; i < 256; i += 1)
-    for (let c = 0; c < 256; c += 1) {
-      const h = c / 256 * 16, S = i / 256 * 16, f = Math.floor(h), m = Math.floor(S), d = h - f, t = S - m, r = p(d), v = p(t), _ = s(f, m, d, t), b = s(f + 1, m, d - 1, t), L = s(f, m + 1, d, t - 1), U = s(f + 1, m + 1, d - 1, t - 1), E = _ + r * (b - _), R = L + r * (U - L), T = E + v * (R - E);
-      n[i * 256 + c] = Math.max(0, Math.min(255, (T / 1.414 + 0.5) * 255 | 0));
+  for (let o = 0; o < 256; o++)
+    for (let s = 0; s < 256; s++) {
+      const p = s / 256 * 16, E = o / 256 * 16, d = Math.floor(p), v = Math.floor(E), T = p - d, R = E - v, A = g(T), S = g(R), e = m(d, v, T, R), b = m(d + 1, v, T - 1, R), x = m(d, v + 1, T, R - 1), y = m(d + 1, v + 1, T - 1, R - 1), t = e + A * (b - e), U = x + A * (y - x), r = t + S * (U - t);
+      u[o * 256 + s] = Math.max(0, Math.min(255, (r / 1.414 + 0.5) * 255 | 0));
     }
-  return n;
+  return u;
 }
-function w(e, o, a) {
-  const n = e.createShader(a);
-  return n ? (e.shaderSource(n, o), e.compileShader(n), e.getShaderParameter(n, e.COMPILE_STATUS) ? n : (console.error("[SmokeEffect] Shader compile error:", e.getShaderInfoLog(n)), e.deleteShader(n), null)) : null;
+function I(i, n, u) {
+  const a = i.createShader(u);
+  return a ? (i.shaderSource(a, n), i.compileShader(a), i.getShaderParameter(a, i.COMPILE_STATUS) ? a : (console.error("Shader compile error:", i.getShaderInfoLog(a)), i.deleteShader(a), null)) : null;
 }
-function oe(e) {
-  const o = w(e, $, e.VERTEX_SHADER), a = w(e, K, e.FRAGMENT_SHADER);
-  if (!o || !a)
-    return o && e.deleteShader(o), a && e.deleteShader(a), null;
-  const n = e.createProgram();
-  return n ? (e.attachShader(n, o), e.attachShader(n, a), e.linkProgram(n), e.detachShader(n, o), e.deleteShader(o), e.detachShader(n, a), e.deleteShader(a), e.getProgramParameter(n, e.LINK_STATUS) ? n : (console.error("[SmokeEffect] Program link failed:", e.getProgramInfoLog(n)), e.deleteProgram(n), null)) : (e.deleteShader(o), e.deleteShader(a), null);
-}
-function ne(e, o) {
-  return {
-    u_alpha: e.getUniformLocation(o, "u_alpha"),
-    u_color: e.getUniformLocation(o, "u_color"),
-    u_contrast: e.getUniformLocation(o, "u_contrast"),
-    u_density: e.getUniformLocation(o, "u_density"),
-    u_direction: e.getUniformLocation(o, "u_direction"),
-    u_intensity: e.getUniformLocation(o, "u_intensity"),
-    u_motion: e.getUniformLocation(o, "u_motion"),
-    u_noise: e.getUniformLocation(o, "u_noise"),
-    u_octaves: e.getUniformLocation(o, "u_octaves"),
-    u_resolution: e.getUniformLocation(o, "u_resolution"),
-    u_size: e.getUniformLocation(o, "u_size"),
-    u_time: e.getUniformLocation(o, "u_time"),
-    u_turbulence: e.getUniformLocation(o, "u_turbulence")
-  };
-}
-function ce() {
-  const e = j(k()), o = O(), { onButtonClick: a, setValue: n } = X(), u = x(null), p = x(null), s = x(null), i = x(null), c = x({}), h = x(e), S = x(o), [f, m] = H(!0);
-  return h.current = e, S.current = o, g(() => a("randomizeColor", () => n("color", Z())), [a, n]), g(() => {
-    const d = u.current;
-    if (!d) return;
-    const t = d.getContext("webgl2", {
+function re() {
+  const i = B(), n = { ...W, ...i }, u = G(), { setValue: a, onButtonClick: f } = H(), g = h(null), m = h(null), o = h(null), s = h(null), p = h({}), E = h(0), d = h(performance.now()), v = h(n), T = h(u);
+  v.current = n, T.current = u;
+  const R = V(() => Z(), []), A = O(() => {
+    const S = Math.random() * 360;
+    a("color", J(S, 70 + Math.random() * 30, 40 + Math.random() * 30));
+  }, [a]);
+  return C(() => {
+    f("randomizeColorBtn", A);
+  }, [f, A]), C(() => {
+    const S = g.current;
+    if (!S) return;
+    const e = S.getContext("webgl2", {
       alpha: !0,
-      antialias: !1,
       premultipliedAlpha: !1,
-      powerPreference: "high-performance"
+      antialias: !1
     });
-    if (!t) {
-      m(!1);
+    if (!e) {
+      console.error("WebGL2 not supported");
       return;
     }
-    const r = oe(t);
-    if (!r) {
-      m(!1);
+    m.current = e, e.enable(e.BLEND), e.blendFunc(e.SRC_ALPHA, e.ONE_MINUS_SRC_ALPHA), e.clearColor(0, 0, 0, 0);
+    const b = e.createTexture();
+    s.current = b, e.bindTexture(e.TEXTURE_2D, b), e.texImage2D(e.TEXTURE_2D, 0, e.R8, 256, 256, 0, e.RED, e.UNSIGNED_BYTE, R), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, e.REPEAT), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, e.REPEAT), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, e.LINEAR), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, e.LINEAR);
+    const x = I(e, $, e.VERTEX_SHADER), y = I(e, j, e.FRAGMENT_SHADER);
+    if (!x || !y) return;
+    const t = e.createProgram();
+    if (e.attachShader(t, x), e.attachShader(t, y), e.linkProgram(t), !e.getProgramParameter(t, e.LINK_STATUS)) {
+      console.error("Program link failed:", e.getProgramInfoLog(t));
       return;
     }
-    const v = t.createTexture();
-    if (!v) {
-      m(!1), t.deleteProgram(r);
-      return;
-    }
-    return p.current = t, s.current = r, i.current = v, c.current = ne(t, r), t.enable(t.BLEND), t.blendFunc(t.SRC_ALPHA, t.ONE_MINUS_SRC_ALPHA), t.clearColor(0, 0, 0, 0), t.useProgram(r), t.activeTexture(t.TEXTURE0), t.bindTexture(t.TEXTURE_2D, v), t.texImage2D(t.TEXTURE_2D, 0, t.R8, 256, 256, 0, t.RED, t.UNSIGNED_BYTE, te()), t.texParameteri(t.TEXTURE_2D, t.TEXTURE_WRAP_S, t.REPEAT), t.texParameteri(t.TEXTURE_2D, t.TEXTURE_WRAP_T, t.REPEAT), t.texParameteri(t.TEXTURE_2D, t.TEXTURE_MIN_FILTER, t.LINEAR), t.texParameteri(t.TEXTURE_2D, t.TEXTURE_MAG_FILTER, t.LINEAR), t.uniform1i(c.current.u_noise, 0), m(!0), () => {
-      i.current && t.deleteTexture(i.current), s.current && t.deleteProgram(s.current), i.current = null, s.current = null, p.current = null, c.current = {};
+    e.detachShader(t, x), e.deleteShader(x), e.detachShader(t, y), e.deleteShader(y), o.current = t, e.useProgram(t), p.current = {
+      u_time: e.getUniformLocation(t, "u_time"),
+      u_resolution: e.getUniformLocation(t, "u_resolution"),
+      u_color: e.getUniformLocation(t, "u_color"),
+      u_speed: e.getUniformLocation(t, "u_speed"),
+      u_origin: e.getUniformLocation(t, "u_origin"),
+      u_direction: e.getUniformLocation(t, "u_direction"),
+      u_scale: e.getUniformLocation(t, "u_scale"),
+      u_brightness: e.getUniformLocation(t, "u_brightness"),
+      u_opacity: e.getUniformLocation(t, "u_opacity"),
+      u_detail: e.getUniformLocation(t, "u_detail"),
+      u_turbulence: e.getUniformLocation(t, "u_turbulence"),
+      u_density: e.getUniformLocation(t, "u_density"),
+      u_height: e.getUniformLocation(t, "u_height"),
+      u_quality: e.getUniformLocation(t, "u_quality"),
+      u_noiseTexture: e.getUniformLocation(t, "u_noiseTexture")
+    }, e.uniform1i(p.current.u_noiseTexture, 0), e.activeTexture(e.TEXTURE0), e.bindTexture(e.TEXTURE_2D, b), d.current = performance.now();
+    const U = () => {
+      const r = m.current, k = o.current;
+      if (!r || !k) return;
+      const l = v.current, _ = g.current;
+      if (!_) return;
+      const w = Math.min(1, Math.max(0.25, l.quality ?? 1)), L = T.current, P = Math.max(L.dpr || window.devicePixelRatio || 1, 1) * w, M = Math.max(1, Math.round((_.clientWidth || L.width || 1) * P)), D = Math.max(1, Math.round((_.clientHeight || L.height || 1) * P));
+      (_.width !== M || _.height !== D) && (_.width = M, _.height = D, r.viewport(0, 0, M, D)), r.clear(r.COLOR_BUFFER_BIT);
+      const c = p.current, F = (performance.now() - d.current) / 1e3;
+      r.uniform1f(c.u_time, F), r.uniform2f(c.u_resolution, _.width, _.height);
+      const [N, X, q] = K(l.color);
+      r.uniform3f(c.u_color, N, X, q), r.uniform1f(c.u_speed, l.speed), r.uniform1f(c.u_origin, l.origin), r.uniform1f(c.u_direction, l.direction), r.uniform1f(c.u_scale, l.scale), r.uniform1f(c.u_brightness, l.brightness), r.uniform1f(c.u_opacity, l.opacity), r.uniform1f(c.u_detail, l.detail), r.uniform1f(c.u_turbulence, l.turbulence), r.uniform1f(c.u_density, l.density), r.uniform1f(c.u_height, l.height), r.uniform1f(c.u_quality, w), r.drawArrays(r.TRIANGLES, 0, 6), E.current = requestAnimationFrame(U);
     };
-  }, []), V(({ time: d }) => {
-    const t = u.current, r = p.current, v = s.current;
-    if (!t || !r || !v) return;
-    const _ = h.current, b = S.current, L = Y[_.quality], U = Math.max(b.dpr || 1, 1), E = Math.max(1, Math.round((b.width || t.clientWidth || 1) * U * L)), R = Math.max(1, Math.round((b.height || t.clientHeight || 1) * U * L));
-    (t.width !== E || t.height !== R) && (t.width = E, t.height = R, r.viewport(0, 0, E, R));
-    const T = G[_.style], [z, N, D] = Q(_.color), [F, C] = W[_.direction], l = c.current;
-    r.useProgram(v), r.clear(r.COLOR_BUFFER_BIT), r.uniform1f(l.u_time, d), r.uniform2f(l.u_resolution, E, R), r.uniform3f(l.u_color, z, N, D), r.uniform2f(l.u_direction, F, C), r.uniform1f(l.u_intensity, _.intensity), r.uniform1f(l.u_motion, _.motion), r.uniform1f(l.u_size, _.size), r.uniform1f(l.u_alpha, T.alpha), r.uniform1f(l.u_contrast, T.contrast), r.uniform1f(l.u_density, T.density), r.uniform1f(l.u_octaves, T.octaves), r.uniform1f(l.u_turbulence, T.turbulence), r.drawArrays(r.TRIANGLES, 0, 6);
-  }), f ? /* @__PURE__ */ I("canvas", { ref: u, style: q }) : /* @__PURE__ */ I("div", { "aria-hidden": !0, style: B });
+    return U(), () => {
+      cancelAnimationFrame(E.current), o.current && (e.deleteProgram(o.current), o.current = null), s.current && (e.deleteTexture(s.current), s.current = null), m.current = null;
+    };
+  }, [R]), /* @__PURE__ */ z("canvas", { ref: g, style: Y });
 }
 export {
-  ce as default
+  re as default
 };
