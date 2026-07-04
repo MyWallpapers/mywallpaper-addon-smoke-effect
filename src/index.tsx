@@ -1,4 +1,4 @@
-import { useSettings, useViewport, useSettingsActions } from '@mywallpaper/sdk-react'
+import { useSettings, useViewport, useSettingsActions } from '@mywallpaper/runtime-kernel/react'
 import { useRef, useEffect, useMemo, useCallback } from 'react'
 
 interface Settings {
@@ -369,7 +369,7 @@ export default function SmokeEffect() {
 
       const quality = Math.min(1, Math.max(0.25, s.quality ?? 1.0))
       const viewport = viewportRef.current
-      const dpr = Math.max(viewport.dpr || window.devicePixelRatio || 1, 1) * quality
+      const dpr = Math.max(viewport.dpr || 1, 1) * quality
       const w = Math.max(1, Math.round((canvas.clientWidth || viewport.width || 1) * dpr))
       const h = Math.max(1, Math.round((canvas.clientHeight || viewport.height || 1) * dpr))
 

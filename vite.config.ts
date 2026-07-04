@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import { widgetPlugin } from '@mywallpaper/vite-plugin'
+import { widgetPlugin } from '@mywallpaper/addon-dev/vite-plugin'
 
 export default defineConfig({
   plugins: [widgetPlugin()],
