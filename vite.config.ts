@@ -1,6 +1,11 @@
 import { defineConfig } from 'vite'
-import { widgetPlugin } from '@mywallpaper/addon-dev/vite-plugin'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [widgetPlugin()],
+  base: './',
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
 })

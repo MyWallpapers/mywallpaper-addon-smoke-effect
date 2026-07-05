@@ -1,20 +1,23 @@
 {
   "name": "mywallpaper-addon-smoke-effect",
-  "version": "9.0.3",
+  "version": "10.0.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch",
-    "serve": "npx serve dist --cors -l 5173"
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "preview": "vite preview --host 0.0.0.0 --port 5173"
   },
   "devDependencies": {
-    "@mywallpaper/addon-dev": "file:../MyWallpaper/packages/addon-dev",
-    "@mywallpaper/runtime-kernel": "file:../MyWallpaper/packages/runtime-kernel",
+    "@vitejs/plugin-react": "^5.2.0",
     "@types/react": "^19.0.0",
-    "react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "typescript": "^5.7.0",
     "vite": "^7.3.2"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

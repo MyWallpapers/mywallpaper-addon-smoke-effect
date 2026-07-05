@@ -1,5 +1,72 @@
-import { useSettings, useViewport, useSettingsActions } from '@mywallpaper/runtime-kernel/react'
-import { useRef, useEffect, useMemo, useCallback } from 'react'
+import { useRef, useEffect, useMemo, useCallback, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+
+interface MyWallpaperApi {
+  settings: {
+    get(): Record<string, unknown>
+    subscribe(listener: (settings: Record<string, unknown>) => void): () => void
+    set(partial: Record<string, unknown>): void
+  }
+  actions: {
+    on(key: string, listener: (event: unknown) => void): () => void
+  }
+}
+
+declare global {
+  interface Window {
+    MyWallpaper?: MyWallpaperApi
+  }
+}
+
+interface Viewport {
+  width: number
+  height: number
+  dpr: number
+}
+
+function useSettings<T>(): T {
+  const [settings, setSettings] = useState<T>(() => (window.MyWallpaper?.settings.get() ?? {}) as T)
+
+  useEffect(() => {
+    return window.MyWallpaper?.settings.subscribe((next) => setSettings(next as T)) ?? (() => {})
+  }, [])
+
+  return settings
+}
+
+function useViewport(): Viewport {
+  const [viewport, setViewport] = useState<Viewport>(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    dpr: window.devicePixelRatio || 1,
+  }))
+
+  useEffect(() => {
+    const update = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio || 1,
+      })
+    }
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  return viewport
+}
+
+function useSettingsActions() {
+  const setValue = useCallback((key: string, value: unknown) => {
+    window.MyWallpaper?.settings.set({ [key]: value })
+  }, [])
+
+  const onButtonClick = useCallback((key: string, handler: (event: unknown) => void) => {
+    return window.MyWallpaper?.actions.on(key, handler) ?? (() => {})
+  }, [])
+
+  return { setValue, onButtonClick }
+}
 
 interface Settings {
   color: string
@@ -41,6 +108,15 @@ const CANVAS_STYLE = {
   padding: 0,
   pointerEvents: 'none',
 } as const
+
+document.documentElement.style.width = '100%'
+document.documentElement.style.height = '100%'
+document.documentElement.style.margin = '0'
+document.body.style.width = '100%'
+document.body.style.height = '100%'
+document.body.style.margin = '0'
+document.body.style.overflow = 'hidden'
+document.body.style.background = 'transparent'
 
 const VERTEX_SHADER = `#version 300 es
 precision mediump float;
@@ -275,7 +351,7 @@ export default function SmokeEffect() {
   }, [setValue])
 
   useEffect(() => {
-    onButtonClick('randomizeColorBtn', randomizeColor)
+    return onButtonClick('randomizeColorBtn', randomizeColor)
   }, [onButtonClick, randomizeColor])
 
   useEffect(() => {
@@ -427,4 +503,9 @@ export default function SmokeEffect() {
   return (
     <canvas ref={canvasRef} style={CANVAS_STYLE} />
   )
+}
+
+const root = document.getElementById('root')
+if (root) {
+  createRoot(root).render(<SmokeEffect />)
 }
