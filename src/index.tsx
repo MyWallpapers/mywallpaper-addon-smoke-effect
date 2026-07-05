@@ -1,7 +1,8 @@
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
-interface MyWallpaperApi {
+interface MyWallpaperLayerApi {
+  root: HTMLElement
   settings: {
     get(): Record<string, unknown>
     subscribe(listener: (settings: Record<string, unknown>) => void): () => void
@@ -10,6 +11,10 @@ interface MyWallpaperApi {
   actions: {
     on(key: string, listener: (event: unknown) => void): () => void
   }
+}
+
+interface MyWallpaperApi {
+  layer: MyWallpaperLayerApi
 }
 
 declare global {
@@ -24,11 +29,14 @@ interface Viewport {
   dpr: number
 }
 
+const layer = window.MyWallpaper?.layer
+const runtimeRoot = layer?.root ?? document.getElementById('root')
+
 function useSettings<T>(): T {
-  const [settings, setSettings] = useState<T>(() => (window.MyWallpaper?.settings.get() ?? {}) as T)
+  const [settings, setSettings] = useState<T>(() => (layer?.settings.get() ?? {}) as T)
 
   useEffect(() => {
-    return window.MyWallpaper?.settings.subscribe((next) => setSettings(next as T)) ?? (() => {})
+    return layer?.settings.subscribe((next) => setSettings(next as T)) ?? (() => {})
   }, [])
 
   return settings
@@ -58,11 +66,11 @@ function useViewport(): Viewport {
 
 function useSettingsActions() {
   const setValue = useCallback((key: string, value: unknown) => {
-    window.MyWallpaper?.settings.set({ [key]: value })
+    layer?.settings.set({ [key]: value })
   }, [])
 
   const onButtonClick = useCallback((key: string, handler: (event: unknown) => void) => {
-    return window.MyWallpaper?.actions.on(key, handler) ?? (() => {})
+    return layer?.actions.on(key, handler) ?? (() => {})
   }, [])
 
   return { setValue, onButtonClick }
@@ -109,14 +117,25 @@ const CANVAS_STYLE = {
   pointerEvents: 'none',
 } as const
 
-document.documentElement.style.width = '100%'
-document.documentElement.style.height = '100%'
-document.documentElement.style.margin = '0'
-document.body.style.width = '100%'
-document.body.style.height = '100%'
-document.body.style.margin = '0'
-document.body.style.overflow = 'hidden'
-document.body.style.background = 'transparent'
+if (runtimeRoot) {
+  runtimeRoot.classList.add('mwa-smoke-root')
+  runtimeRoot.style.width = '100%'
+  runtimeRoot.style.height = '100%'
+  runtimeRoot.style.margin = '0'
+  runtimeRoot.style.overflow = 'hidden'
+  runtimeRoot.style.background = 'transparent'
+}
+
+if (!layer) {
+  document.documentElement.style.width = '100%'
+  document.documentElement.style.height = '100%'
+  document.documentElement.style.margin = '0'
+  document.body.style.width = '100%'
+  document.body.style.height = '100%'
+  document.body.style.margin = '0'
+  document.body.style.overflow = 'hidden'
+  document.body.style.background = 'transparent'
+}
 
 const VERTEX_SHADER = `#version 300 es
 precision mediump float;
@@ -505,7 +524,6 @@ export default function SmokeEffect() {
   )
 }
 
-const root = document.getElementById('root')
-if (root) {
-  createRoot(root).render(<SmokeEffect />)
+if (runtimeRoot) {
+  createRoot(runtimeRoot).render(<SmokeEffect />)
 }
