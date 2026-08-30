@@ -1,27 +1,6 @@
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-
-interface MyWallpaperLayerApi {
-  root: HTMLElement
-  settings: {
-    get(): Record<string, unknown>
-    subscribe(listener: (settings: Record<string, unknown>) => void): () => void
-    set(partial: Record<string, unknown>): void
-  }
-  actions: {
-    on(key: string, listener: (event: unknown) => void): () => void
-  }
-}
-
-interface MyWallpaperApi {
-  layer: MyWallpaperLayerApi
-}
-
-declare global {
-  interface Window {
-    MyWallpaper?: MyWallpaperApi
-  }
-}
+import type { CanvasAddonMountContext, JsonValue } from '../generated/mywallpaper-runtime'
 
 interface Viewport {
   width: number
@@ -29,49 +8,54 @@ interface Viewport {
   dpr: number
 }
 
-const layer = window.MyWallpaper?.layer
-const runtimeRoot = layer?.root ?? document.getElementById('root')
+type LayerApi = CanvasAddonMountContext['layer']
 
-function useSettings<T>(): T {
-  const [settings, setSettings] = useState<T>(() => (layer?.settings.get() ?? {}) as T)
+function useSettings<T>(layer: LayerApi): T {
+  const [settings, setSettings] = useState<T>(() => layer.settings.get() as T)
 
   useEffect(() => {
-    return layer?.settings.subscribe((next) => setSettings(next as T)) ?? (() => {})
-  }, [])
+    return layer.settings.subscribe((next) => setSettings(next as T))
+  }, [layer])
 
   return settings
 }
 
-function useViewport(): Viewport {
+function useViewport(layer: LayerApi): Viewport {
   const [viewport, setViewport] = useState<Viewport>(() => ({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: layer.root.clientWidth || window.innerWidth,
+    height: layer.root.clientHeight || window.innerHeight,
     dpr: window.devicePixelRatio || 1,
   }))
 
   useEffect(() => {
     const update = () => {
       setViewport({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: layer.root.clientWidth || window.innerWidth,
+        height: layer.root.clientHeight || window.innerHeight,
         dpr: window.devicePixelRatio || 1,
       })
     }
+    update()
     window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
+    const observer = new ResizeObserver(update)
+    observer.observe(layer.root)
+    return () => {
+      window.removeEventListener('resize', update)
+      observer.disconnect()
+    }
+  }, [layer])
 
   return viewport
 }
 
-function useSettingsActions() {
-  const setValue = useCallback((key: string, value: unknown) => {
-    layer?.settings.set({ [key]: value })
-  }, [])
+function useSettingsActions(layer: LayerApi) {
+  const setValue = useCallback((key: string, value: JsonValue) => {
+    void layer.settings.set({ [key]: value })
+  }, [layer])
 
   const onButtonClick = useCallback((key: string, handler: (event: unknown) => void) => {
-    return layer?.actions.on(key, handler) ?? (() => {})
-  }, [])
+    return layer.actions.on(key, handler)
+  }, [layer])
 
   return { setValue, onButtonClick }
 }
@@ -116,26 +100,6 @@ const CANVAS_STYLE = {
   padding: 0,
   pointerEvents: 'none',
 } as const
-
-if (runtimeRoot) {
-  runtimeRoot.classList.add('mwa-smoke-root')
-  runtimeRoot.style.width = '100%'
-  runtimeRoot.style.height = '100%'
-  runtimeRoot.style.margin = '0'
-  runtimeRoot.style.overflow = 'hidden'
-  runtimeRoot.style.background = 'transparent'
-}
-
-if (!layer) {
-  document.documentElement.style.width = '100%'
-  document.documentElement.style.height = '100%'
-  document.documentElement.style.margin = '0'
-  document.body.style.width = '100%'
-  document.body.style.height = '100%'
-  document.body.style.margin = '0'
-  document.body.style.overflow = 'hidden'
-  document.body.style.background = 'transparent'
-}
 
 const VERTEX_SHADER = `#version 300 es
 precision mediump float;
@@ -344,11 +308,11 @@ function compileShader(gl: WebGL2RenderingContext, source: string, type: number)
   return shader
 }
 
-export default function SmokeEffect() {
-  const raw = useSettings<Partial<Settings>>()
+export default function SmokeEffect({ layer }: { layer: LayerApi }) {
+  const raw = useSettings<Partial<Settings>>(layer)
   const settings: Settings = { ...DEFAULTS, ...raw }
-  const viewport = useViewport()
-  const { setValue, onButtonClick } = useSettingsActions()
+  const viewport = useViewport(layer)
+  const { setValue, onButtonClick } = useSettingsActions(layer)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const glRef = useRef<WebGL2RenderingContext | null>(null)
   const programRef = useRef<WebGLProgram | null>(null)
@@ -524,6 +488,20 @@ export default function SmokeEffect() {
   )
 }
 
-if (runtimeRoot) {
-  createRoot(runtimeRoot).render(<SmokeEffect />)
+export function mount(context: CanvasAddonMountContext): () => void {
+  const root = context.layer.root
+  root.classList.add('mwa-smoke-root')
+  root.style.width = '100%'
+  root.style.height = '100%'
+  root.style.margin = '0'
+  root.style.overflow = 'hidden'
+  root.style.background = 'transparent'
+
+  const reactRoot = createRoot(root)
+  reactRoot.render(<SmokeEffect layer={context.layer} />)
+  return () => {
+    reactRoot.unmount()
+    root.classList.remove('mwa-smoke-root')
+    root.replaceChildren()
+  }
 }

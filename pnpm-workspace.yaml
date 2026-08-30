@@ -1,4 +1,2 @@
 packages:
   - .
-  - ../MyWallpaper/packages/addon-dev
-  - ../MyWallpaper/packages/runtime-kernel
