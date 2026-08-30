@@ -38,16 +38,20 @@ Animated smoke effect with customizable color, motion, density, and performance 
 
 ## Installation
 
-1. Download or clone this repository
-2. In MyWallpaper, go to **Add-ons** > **Install from folder**
-3. Select the `mywallpaper-smoke-effect` folder
+The repository is published through the canonical MyWallpaper add-on
+admission workflow. For a local development install, build the repository and
+install the resulting `dist/` directory from MyWallpaper's developer tools.
 
 ## Development
 
 ```bash
-npx serve . -p 3000
-# In MyWallpaper: Settings > Developer > Enter http://localhost:3000 > Test
+pnpm install
+pnpm dev
+# Use the developer tools in MyWallpaper to load the local Vite origin.
 ```
+
+The release bundle is produced with `pnpm build`; `dist/index.html` and
+`dist/assets/addon.js` are the only runtime entry files.
 
 ## Technical Details
 
