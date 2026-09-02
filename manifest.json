@@ -2,8 +2,8 @@
   "runtime": "canvas-v1",
   "name": "Smoke Effect",
   "description": "Mesmerizing animated smoke effect with customizable colors and fluid dynamics.",
-  "version": "10.1.0",
-  "entry": "dist/index.html",
+  "version": "10.1.1",
+  "entry": "dist/assets/addon.js",
   "thumbnail": "assets/thumbnail.png",
   "deviceSettingsVersion": "1",
   "ui": {
