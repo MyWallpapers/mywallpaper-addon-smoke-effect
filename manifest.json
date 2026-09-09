@@ -2,7 +2,7 @@
   "runtime": "canvas-v1",
   "name": "Smoke Effect",
   "description": "Mesmerizing animated smoke effect with customizable colors and fluid dynamics.",
-  "version": "10.1.1",
+  "version": "10.1.2",
   "entry": "dist/assets/addon.js",
   "thumbnail": "assets/thumbnail.png",
   "deviceSettingsVersion": "1",
@@ -10,22 +10,170 @@
     "pointerEvents": "none"
   },
   "settings": [
-    { "id": "colors", "type": "section", "label": "Colors" },
-    { "id": "color", "type": "color", "label": "Smoke color", "scope": "layer", "default": "#FFFFFF" },
-    { "id": "randomizeColorBtn", "type": "button", "label": "Randomize color", "buttonLabel": "Randomize color" },
-    { "id": "motion", "type": "section", "label": "Motion" },
-    { "id": "speed", "type": "range", "label": "Speed", "description": "How fast the smoke moves", "parent": "motion", "scope": "layer", "min": 0, "max": 1, "step": 0.01, "default": 0.28 },
-    { "id": "origin", "type": "range", "label": "Origin", "description": "Where smoke comes from", "parent": "motion", "scope": "layer", "min": 0, "max": 360, "step": 1, "default": 0 },
-    { "id": "direction", "type": "range", "label": "Direction", "description": "Where smoke travels", "parent": "motion", "scope": "layer", "min": 0, "max": 360, "step": 1, "default": 0 },
-    { "id": "performance", "type": "section", "label": "Performance" },
-    { "id": "quality", "type": "range", "label": "Quality", "description": "Rendering resolution", "parent": "performance", "scope": "layer", "min": 0.25, "max": 1, "step": 0.05, "default": 1 },
-    { "id": "appearance", "type": "section", "label": "Appearance" },
-    { "id": "scale", "type": "range", "label": "Scale", "description": "Size of smoke patterns", "parent": "appearance", "scope": "layer", "min": 0.2, "max": 50, "step": 0.1, "default": 6 },
-    { "id": "brightness", "type": "range", "label": "Brightness", "description": "Color brightness", "parent": "appearance", "scope": "layer", "min": 0.1, "max": 3, "step": 0.1, "default": 1 },
-    { "id": "opacity", "type": "range", "label": "Opacity", "description": "Overall smoke transparency", "parent": "appearance", "scope": "layer", "min": 0, "max": 1, "step": 0.01, "default": 1 },
-    { "id": "detail", "type": "range", "label": "Detail", "description": "Noise complexity", "parent": "appearance", "scope": "layer", "min": 0, "max": 3, "step": 0.05, "default": 1.25 },
-    { "id": "turbulence", "type": "range", "label": "Turbulence", "description": "Chaos and distortion", "parent": "appearance", "scope": "layer", "min": 0, "max": 2, "step": 0.05, "default": 2 },
-    { "id": "density", "type": "range", "label": "Density", "description": "Smoke thickness", "parent": "appearance", "scope": "layer", "min": 0.1, "max": 3, "step": 0.1, "default": 0.5 },
-    { "id": "height", "type": "range", "label": "Height", "description": "How far smoke extends", "parent": "appearance", "scope": "layer", "min": 0, "max": 3, "step": 0.1, "default": 0.7 }
+    {
+      "id": "colors",
+      "type": "section",
+      "label": "Colors"
+    },
+    {
+      "id": "color",
+      "type": "color",
+      "label": "Smoke color",
+      "scope": "layer",
+      "default": "#FFFFFF"
+    },
+    {
+      "id": "randomizeColorBtn",
+      "type": "button",
+      "label": "Randomize color",
+      "buttonLabel": "Randomize color"
+    },
+    {
+      "id": "motion",
+      "type": "section",
+      "label": "Motion"
+    },
+    {
+      "id": "speed",
+      "type": "range",
+      "label": "Speed",
+      "description": "How fast the smoke moves",
+      "parent": "motion",
+      "scope": "layer",
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "default": 0.28
+    },
+    {
+      "id": "origin",
+      "type": "range",
+      "label": "Origin",
+      "description": "Where smoke comes from",
+      "parent": "motion",
+      "scope": "layer",
+      "min": 0,
+      "max": 360,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "id": "direction",
+      "type": "range",
+      "label": "Direction",
+      "description": "Where smoke travels",
+      "parent": "motion",
+      "scope": "layer",
+      "min": 0,
+      "max": 360,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "id": "performance",
+      "type": "section",
+      "label": "Performance"
+    },
+    {
+      "id": "quality",
+      "type": "range",
+      "label": "Quality",
+      "description": "Rendering resolution",
+      "parent": "performance",
+      "scope": "layer",
+      "min": 0.25,
+      "max": 1,
+      "step": 0.05,
+      "default": 1
+    },
+    {
+      "id": "appearance",
+      "type": "section",
+      "label": "Appearance"
+    },
+    {
+      "id": "scale",
+      "type": "range",
+      "label": "Scale",
+      "description": "Size of smoke patterns",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0.2,
+      "max": 50,
+      "step": 0.1,
+      "default": 6
+    },
+    {
+      "id": "brightness",
+      "type": "range",
+      "label": "Brightness",
+      "description": "Color brightness",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0.1,
+      "max": 3,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "id": "opacity",
+      "type": "range",
+      "label": "Opacity",
+      "description": "Overall smoke transparency",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "default": 1
+    },
+    {
+      "id": "detail",
+      "type": "range",
+      "label": "Detail",
+      "description": "Noise complexity",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0,
+      "max": 3,
+      "step": 0.05,
+      "default": 1.25
+    },
+    {
+      "id": "turbulence",
+      "type": "range",
+      "label": "Turbulence",
+      "description": "Chaos and distortion",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0,
+      "max": 2,
+      "step": 0.05,
+      "default": 2
+    },
+    {
+      "id": "density",
+      "type": "range",
+      "label": "Density",
+      "description": "Smoke thickness",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0.1,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.5
+    },
+    {
+      "id": "height",
+      "type": "range",
+      "label": "Height",
+      "description": "How far smoke extends",
+      "parent": "appearance",
+      "scope": "layer",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.7
+    }
   ]
 }

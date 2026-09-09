@@ -50,8 +50,8 @@ pnpm dev
 # Use the developer tools in MyWallpaper to load the local Vite origin.
 ```
 
-The release bundle is produced with `pnpm build`; `dist/index.html` and
-`dist/assets/addon.js` are the only runtime entry files.
+The release bundle is produced with `pnpm build`. Its ESM entry
+`dist/assets/addon.js` exports `mount`; no HTML loader is shipped.
 
 ## Technical Details
 
@@ -65,3 +65,19 @@ The release bundle is produced with `pnpm build`; `dist/index.html` and
 ## License
 
 MIT License
+
+## Publishing
+
+Merge the source and matching manifest/package version into the reviewed default
+branch, wait for quality checks, then push a new immutable `v<version>` tag.
+Open this add-on's management page in MyWallpaper and select that tag to request
+publication with an active lifetime entitlement.
+
+MyWallpaper resolves the exact public repository and commit, dispatches its
+pinned central workflow, rebuilds and verifies the artifacts, and publishes the
+immutable transport from the platform repository. The add-on repository needs
+no publication workflow or MyWallpaper credential. Do not pre-create a GitHub
+release: a source tag alone does not publish the add-on to the catalogue.
+
+Each accepted newer release is available for new installations. Existing
+wallpapers remain pinned to their exact release until explicitly changed.
